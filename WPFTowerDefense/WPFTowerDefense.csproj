@@ -1,0 +1,92 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Database\TD.db" />
+    <None Remove="Images\epictitleimage.png" />
+    <None Remove="Images\floor.png" />
+    <None Remove="Images\gameguide.png" />
+    <None Remove="Images\levela.png" />
+    <None Remove="Images\levelb.png" />
+    <None Remove="Images\levelc.png" />
+    <None Remove="Resources\Enemies\Enemyfire.png" />
+    <None Remove="Resources\Enemies\Enemygrass.png" />
+    <None Remove="Resources\Enemies\Enemynormal.png" />
+    <None Remove="Resources\Enemies\Enemywater.png" />
+    <None Remove="Resources\MapTiles\GrassFloor.png" />
+    <None Remove="Resources\MapTiles\PathBottomLeft.png" />
+    <None Remove="Resources\MapTiles\PathBottomRight.png" />
+    <None Remove="Resources\MapTiles\PathLeftRight.png" />
+    <None Remove="Resources\MapTiles\PathTopBottom.png" />
+    <None Remove="Resources\MapTiles\PathTopLeft.png" />
+    <None Remove="Resources\MapTiles\PathTopRight.png" />
+    <None Remove="Resources\Towers\FireTower.png" />
+    <None Remove="Resources\Towers\GrassTower.png" />
+    <None Remove="Resources\Towers\WaterTower.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Database\TD.db">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.Data.SQLite" Version="1.0.119" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Images\epictitleimage.png" />
+    <Resource Include="Images\floor.png" />
+    <Resource Include="Images\gameguide.png" />
+    <Resource Include="Images\levela.png" />
+    <Resource Include="Images\levelb.png" />
+    <Resource Include="Images\levelc.png" />
+    <Resource Include="Resources\Enemies\EnemyFire.png" />
+    <Resource Include="Resources\Enemies\EnemyGrass.png" />
+    <Resource Include="Resources\Enemies\EnemyNormal.png" />
+    <Resource Include="Resources\Enemies\EnemyWater.png" />
+    <Resource Include="Resources\MapTiles\GrassFloor.png" />
+    <Resource Include="Resources\MapTiles\PathBottomLeft.png" />
+    <Resource Include="Resources\MapTiles\PathBottomRight.png" />
+    <Resource Include="Resources\MapTiles\PathLeftRight.png" />
+    <Resource Include="Resources\MapTiles\PathTopBottom.png" />
+    <Resource Include="Resources\MapTiles\PathTopLeft.png" />
+    <Resource Include="Resources\MapTiles\PathTopRight.png" />
+    <Resource Include="Resources\Towers\FireTower.png" />
+    <Resource Include="Resources\Towers\GrassTower.png" />
+    <Resource Include="Resources\Towers\WaterTower.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Properties\Settings.Designer.cs">
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Levels\LevelA.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Levels\LevelB.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Levels\LevelC.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+
+</Project>
