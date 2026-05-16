@@ -3,6 +3,9 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> a77d24ca088a96fb0f6948850616e0425a9c0377
 # WpfTD2 MVVM Cheat Sheet
 
 This project was rewritten to follow the same MVVM style as the corrected `TowerDefense2` reference project:
@@ -271,6 +274,7 @@ There are still nullable warnings, mostly from existing model/game classes and a
 =======
 # TowerDefense2
 >>>>>>> 88d681c718d79f3b1d3b8ad5c94680b4b08104c0
+<<<<<<< HEAD
 =======
 # WpfTD
 >>>>>>> parent of 88d681c (Reapply " .")
@@ -283,3 +287,5 @@ There are still nullable warnings, mostly from existing model/game classes and a
 =======
 # WpfTD
 >>>>>>> parent of 8eac730 ( .)
+=======
+>>>>>>> a77d24ca088a96fb0f6948850616e0425a9c0377
