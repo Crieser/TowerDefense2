@@ -1,12 +1,11 @@
-<Window x:Class="WPFTowerDefense.ExitConfirmationWindow"
-        x:Name="ExitWindow"
+﻿<Window x:Class="WPFTowerDefense.ExitConfirmationWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WPFTowerDefense"
         mc:Ignorable="d"
-        Title="Confirm Exit" Height="150" Width="300"
+         Title="Confirm Exit" Height="150" Width="300"
         WindowStartupLocation="CenterOwner"
         ResizeMode="NoResize"
         WindowStyle="None"
@@ -21,8 +20,8 @@
                        TextWrapping="Wrap" FontSize="14" 
                        TextAlignment="Center" Margin="0,0,0,15"/>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                <Button Content="Yes" Width="80" Margin="5,0" Command="{Binding YesCommand}"/>
-                <Button Content="No" Width="80" Margin="5,0" Command="{Binding NoCommand}" CommandParameter="{Binding ElementName=ExitWindow}"/>
+                <Button Content="Yes" Width="80" Margin="5,0" Click="Yes_Click"/>
+                <Button Content="No" Width="80" Margin="5,0" Click="No_Click"/>
             </StackPanel>
         </StackPanel>
     </Grid>

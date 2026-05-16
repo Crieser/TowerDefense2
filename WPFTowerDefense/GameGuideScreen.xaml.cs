@@ -10,28 +10,26 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Navigation;
 using System.Windows.Shapes;
 
 namespace WPFTowerDefense
 {
     /// <summary>
-    /// Interaction logic for ExitConfirmationWindow.xaml
+    /// Interaction logic for GameGuideScreen.xaml
     /// </summary>
-    public partial class ExitConfirmationWindow : Window
+    public partial class GameGuideScreen : Page
     {
-        public ExitConfirmationWindow()
+        private MainWindow _mainWindow;
+        public GameGuideScreen(MainWindow mainWindow)
         {
             InitializeComponent();
+            _mainWindow = mainWindow;
         }
 
-        private void Yes_Click(object sender, RoutedEventArgs e)
+        private void Return_Click(object sender, RoutedEventArgs e)
         {
-            Application.Current.Shutdown();
-        }
-
-        private void No_Click(object sender, RoutedEventArgs e)
-        {
-            this.Close();
+            _mainWindow.NavigateTo(new StartScreen(_mainWindow));
         }
     }
 }
