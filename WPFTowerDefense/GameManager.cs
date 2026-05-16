@@ -1,6 +1,7 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -44,7 +45,7 @@ namespace WPFTowerDefense
             gameCanvas = canvas;
             this.tileSize = tileSize;
         }
-        // Method to load the selected Level
+
         public void LoadLevel(LevelData level)
         {
             currentLevel = level;
@@ -52,7 +53,7 @@ namespace WPFTowerDefense
             enemyPath = level.PathTiles;
             InitializeGrid(16, 8);
         }
-        // Method to initialize the grid with tiles
+
         public void InitializeGrid(int gridWidth, int gridHeight)
         {
             gameCanvas.Children.Clear();
@@ -76,7 +77,7 @@ namespace WPFTowerDefense
                 }
             }
         }
-        // Method to get the texture for a specific tile position
+
         private ImageSource GetTileTexture(Point tilePos)
         {
             if (!currentLevel.PathTiles.Contains(tilePos))
@@ -87,20 +88,20 @@ namespace WPFTowerDefense
             if (index == 0)
             {
                 Vector dir = currentLevel.PathTiles[1] - tilePos;
-                return GetEndCapTile(dir); // start cap
+                return GetEndCapTile(dir);
             }
 
             if (index == currentLevel.PathTiles.Count - 1)
             {
                 Vector dir = tilePos - currentLevel.PathTiles[index - 1];
-                return GetEndCapTile(dir); // end cap
+                return GetEndCapTile(dir);
             }
 
             Point prev = currentLevel.PathTiles[index - 1];
             Point next = currentLevel.PathTiles[index + 1];
             return GetPathTileTexture(prev, tilePos, next);
         }
-        // Method to get the texture for path tiles based on direction
+
         private ImageSource GetPathTileTexture(Point prev, Point current, Point next)
         {
             Vector dir1 = current - prev;
@@ -121,7 +122,7 @@ namespace WPFTowerDefense
 
             return pathTileTexture;
         }
-        // Method to get the end cap tile texture based on direction
+
         private ImageSource GetEndCapTile(Vector dir)
         {
             if (dir == new Vector(1, 0)) return LoadTexture("PathLeftRight.png");
@@ -131,23 +132,23 @@ namespace WPFTowerDefense
 
             return pathTileTexture;
         }
-        // Method to load a texture from resources
+
         private ImageSource LoadTexture(string fileName)
         {
             return new BitmapImage(new Uri($"pack://application:,,,/Resources/MapTiles/{fileName}"));
         }
-        // Method to add gold to the player's balance
+
         private void AddGold(int amount)
         {
             Gold += amount;
             OnGoldChanged?.Invoke(Gold);
         }
-        // Method to reward the player at the end of a wave
+
         private void RewardWaveEnd()
         {
             AddGold(200);
         }
-        // Method to place a tower at a specific position
+
         public void PlaceTower(Point dropPosition, ImageSource towerImage, TowerData towerData)
         {
             if (Gold < towerData.Cost)
@@ -155,8 +156,6 @@ namespace WPFTowerDefense
                 ShowGoldWarning?.Invoke();
                 return;
             }
-
-
 
             int gridX = (int)(dropPosition.X / tileSize);
             int gridY = (int)(dropPosition.Y / tileSize);
@@ -193,22 +192,19 @@ namespace WPFTowerDefense
                 Cost = towerData.Cost
             };
 
-            // Deduct gold and notify UI
             Gold -= towerData.Cost;
             OnGoldChanged?.Invoke(Gold);
 
             placedTowers.Add(newTower);
-
 
             Image towerImageVisual = new()
             {
                 Width = tileSize,
                 Height = tileSize,
                 Source = towerImage,
-                IsHitTestVisible = true // enable click detection
+                IsHitTestVisible = true
             };
 
-            // 🟢 Hook up click event to select the tower
             towerImageVisual.MouseLeftButtonDown += (s, e) =>
             {
                 OnTowerSelected?.Invoke(newTower);
@@ -218,29 +214,28 @@ namespace WPFTowerDefense
             Canvas.SetLeft(towerImageVisual, snappedX);
             Canvas.SetTop(towerImageVisual, snappedY);
             gameCanvas.Children.Add(towerImageVisual);
-
         }
-        // Method to set enemy data for the game
+
         public void SetEnemyData(List<EnemyData> data)
         {
             loadedEnemyData = data;
         }
-        // Method to set effect data for the game
+
         public void SetEffectData(List<EffectData> data)
         {
             loadedEffects = data;
         }
-        // Method to set tower data for the game
+
         public void SetTowerData(List<TowerData> data)
         {
             loadedTowers = data;
         }
-        // Method to get the loaded tower data
+
         public List<TowerData> GetTowerData()
         {
             return loadedTowers;
         }
-        // Method to upgrade a tower
+
         public void UpgradeTower(Tower baseTower, TowerData upgrade)
         {
             if (Gold < upgrade.Cost) return;
@@ -259,7 +254,7 @@ namespace WPFTowerDefense
 
             Console.WriteLine($"Upgraded to {upgrade.TowerName}");
         }
-        // Method to start a wave of enemies
+
         public void StartWave(int waveNumber)
         {
             currentWaveNumber = waveNumber;
@@ -272,10 +267,9 @@ namespace WPFTowerDefense
             lastSpawnTime = DateTime.Now;
             lastUpdateTime = DateTime.Now;
 
-
             CompositionTarget.Rendering += GameLoop;
         }
-        // Method to handle player damage
+
         private void DamagePlayer(int amount)
         {
             PlayerHealth -= amount;
@@ -284,30 +278,24 @@ namespace WPFTowerDefense
 
             if (PlayerHealth == 0)
             {
-                // Save highscore on death
                 Database.HighscoreManager.UpdateBestWave("Database/TD.db", currentLevelName, currentWaveNumber - 1);
-
-                // Notify UI to show GameOverScreen
                 OnPlayerDefeated?.Invoke();
             }
         }
-        // Method to reset the game state
+
         public void Dispose()
         {
             CompositionTarget.Rendering -= GameLoop;
             activeEnemies.Clear();
             placedTowers.Clear();
             currentWaveQueue?.Clear();
-
-            // Clear canvas if needed
             gameCanvas.Children.Clear();
 
             Debug.WriteLine("GameManager instance disposed.");
         }
-        // Game loop method that updates the game state
+
         private void GameLoop(object sender, EventArgs e)
         {
-
             if (gameCanvas == null || activeEnemies == null || placedTowers == null)
                 return;
 
@@ -315,7 +303,6 @@ namespace WPFTowerDefense
             double deltaTime = (now - lastUpdateTime).TotalSeconds;
             lastUpdateTime = now;
 
-            // Spawn enemies
             if (enemiesSpawned < enemiesToSpawn && now - lastSpawnTime > spawnInterval)
             {
                 if (currentWaveQueue.TryDequeue(out EnemyData data))
@@ -327,7 +314,6 @@ namespace WPFTowerDefense
                 }
             }
 
-            // Mark enemies to remove
             List<Enemy> enemiesToRemove = new();
 
             foreach (var enemy in activeEnemies.ToList())
@@ -346,13 +332,11 @@ namespace WPFTowerDefense
                 }
             }
 
-            // Remove them after iteration
             foreach (var enemy in enemiesToRemove)
             {
                 activeEnemies.Remove(enemy);
             }
 
-            // Stop loop if done
             if (enemiesSpawned >= enemiesToSpawn && activeEnemies.Count == 0)
             {
                 CompositionTarget.Rendering -= GameLoop;
@@ -360,7 +344,6 @@ namespace WPFTowerDefense
                 OnWaveEnded?.Invoke();
             }
 
-            // Towers attack enemies
             foreach (var tower in placedTowers)
             {
                 foreach (var enemy in activeEnemies.ToList())
@@ -373,21 +356,7 @@ namespace WPFTowerDefense
                         double timeSinceLastShot = (DateTime.Now - tower.LastAttackTime).TotalSeconds;
                         if (timeSinceLastShot >= tower.AttackCooldown)
                         {
-                            double finalDamage = tower.Damage;
-
-                            if (enemy.Data.Vulnerability == tower.Type)
-                            {
-                                finalDamage += tower.Damage * enemy.Data.IncreasedDamageTakenPercent;
-                            }
-                            else if (enemy.Data.Resistance == tower.Type)
-                            {
-                                finalDamage -= tower.Damage * enemy.Data.DecreasedDamageTakenPercent;
-                            }
-
-                            finalDamage = Math.Max(0, finalDamage);
-
                             tower.LastAttackTime = DateTime.Now;
-
                             Point impactCenter = enemy.Position;
 
                             foreach (var targetEnemy in activeEnemies)
@@ -403,12 +372,10 @@ namespace WPFTowerDefense
                                     {
                                         dmg += tower.Damage * targetEnemy.Data.IncreasedDamageTakenPercent;
                                     }
-                                        
                                     else if (targetEnemy.Data.Resistance == tower.Type)
                                     {
                                         dmg -= tower.Damage * targetEnemy.Data.DecreasedDamageTakenPercent;
                                     }
-                                        
 
                                     dmg = Math.Max(0, dmg);
                                     targetEnemy.TakeDamage(dmg);
@@ -424,7 +391,6 @@ namespace WPFTowerDefense
                                     }
                                 }
                             }
-
                         }
                         break;
                     }

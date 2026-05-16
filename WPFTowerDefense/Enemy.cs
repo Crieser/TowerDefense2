@@ -1,11 +1,10 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
-
 using WPFTowerDefense.GameLogic;
 
 namespace WPFTowerDefense
@@ -28,7 +27,6 @@ namespace WPFTowerDefense
         private Rectangle healthBarFill;
         private List<ActiveEffect> activeEffects = new();
 
-        //Enemy that spawns 
         public Enemy(EnemyData data, List<Point> tilePath, int tileSize, Canvas canvas)
         {
             Data = data;
@@ -37,7 +35,7 @@ namespace WPFTowerDefense
 
             MaxHealth = data.Health;
             Health = MaxHealth;
-            BaseSpeed = data.MovementSpeed * tileSize * 4; //*4 Multiplier
+            BaseSpeed = data.MovementSpeed * tileSize * 4;
             CurrentSpeed = BaseSpeed;
 
             Position = new Point(path[0].X * tileSize + tileSize / 2, path[0].Y * tileSize + tileSize / 2);
@@ -73,7 +71,7 @@ namespace WPFTowerDefense
             canvas.Children.Add(healthBarFill);
             UpdateVisual();
         }
-        //Check if the enemy is alive and update its position based on the path
+
         public void Update(double deltaTime)
         {
             if (ReachedEnd || !IsAlive) return;
@@ -97,7 +95,7 @@ namespace WPFTowerDefense
 
             UpdateVisual();
         }
-        // Processes the active effects on the enemy
+
         private void ProcessEffects(double deltaTime)
         {
             bool isStunned = false;
@@ -128,9 +126,8 @@ namespace WPFTowerDefense
             }
 
             CurrentSpeed = isStunned ? 0 : BaseSpeed * slowMultiplier;
-
         }
-        //Updates enemy's visual and health bar position
+
         private void UpdateVisual()
         {
             Canvas.SetLeft(visual, Position.X - visual.Width / 2);
@@ -146,20 +143,20 @@ namespace WPFTowerDefense
             Canvas.SetLeft(healthBarFill, barX);
             Canvas.SetTop(healthBarFill, barY);
         }
-        // Method that handles the enemy taking damage
+
         public void TakeDamage(double amount)
         {
             Health -= amount;
             if (Health < 0) Health = 0;
         }
-        // Method that handles the enemy being killed
+
         public void RemoveFromCanvas(Canvas canvas)
         {
             canvas.Children.Remove(visual);
             canvas.Children.Remove(healthBarFill);
             canvas.Children.Remove(healthBarBackground);
         }
-        // Method that applies an effect to the enemy
+
         public void ApplyEffect(EffectData effect)
         {
             activeEffects.Add(new ActiveEffect
@@ -170,7 +167,7 @@ namespace WPFTowerDefense
                 DamagePerSecond = effect.DamageFactor
             });
         }
-        // Class with the active effects on the enemy with its values
+
         private class ActiveEffect
         {
             public string Type;

@@ -1,14 +1,22 @@
-﻿using System.Configuration;
-using System.Data;
 using System.Windows;
+using Prism.Events;
+using WPFTowerDefense.ViewModels;
 
 namespace WPFTowerDefense
 {
-    /// <summary>
-    /// Interaction logic for App.xaml
-    /// </summary>
     public partial class App : Application
     {
-    }
+        private IEventAggregator _eventAggregator;
 
+        protected override void OnStartup(StartupEventArgs e)
+        {
+            base.OnStartup(e);
+
+            _eventAggregator = new EventAggregator();
+            MainWindow mainWindow = new MainWindow();
+            MainViewModel mainViewModel = new MainViewModel(_eventAggregator);
+            mainWindow.DataContext = mainViewModel;
+            mainWindow.Show();
+        }
+    }
 }
