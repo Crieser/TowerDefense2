@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System;
 using System.Windows;
 
 namespace WPFTowerDefense
@@ -28,6 +24,5 @@ namespace WPFTowerDefense
 
         public double AttackCooldown => 0.5 / AttackSpeed;
         public double PixelRange => Range * 80;
-
     }
 }

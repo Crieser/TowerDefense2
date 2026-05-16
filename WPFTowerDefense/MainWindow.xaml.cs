@@ -1,14 +1,4 @@
-﻿using System.Text;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Animation;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace WPFTowerDefense
 {
@@ -17,23 +7,6 @@ namespace WPFTowerDefense
         public MainWindow()
         {
             InitializeComponent();
-            MainFrame.Navigate(new StartScreen(this));
-        }
-
-        public void NavigateTo(Page page)
-        {
-            MainFrame.Navigate(page);
-        }
-
-        public void ShowDimOverlay()
-        {
-            DimOverlay.Visibility = Visibility.Visible;
-        }
-
-        public void HideDimOverlay()
-        {
-            DimOverlay.Visibility = Visibility.Collapsed;
         }
     }
-
 }
