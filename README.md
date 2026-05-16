@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # WpfTD2 MVVM Cheat Sheet
 
 This project was rewritten to follow the same MVVM style as the corrected `TowerDefense2` reference project:
@@ -263,3 +264,6 @@ Their namespaces changed from `WPFTowerDefense` to `WPFTowerDefense.Views`.
 `dotnet build WPFTowerDefense/WPFTowerDefense.csproj` succeeds.
 
 There are still nullable warnings, mostly from existing model/game classes and a few helper signatures copied in the same style as the reference project. No build errors remain.
+=======
+# TowerDefense2
+>>>>>>> 88d681c718d79f3b1d3b8ad5c94680b4b08104c0
