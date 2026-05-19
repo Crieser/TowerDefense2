@@ -23,13 +23,21 @@ namespace WPFTowerDefense
             double roll = rand.NextDouble();
 
             if (roll < level5Chance)
+            {
                 level = 5;
+            }
             else if (roll < level5Chance + level4Chance)
+            {
                 level = 4;
+            }           
             else if (roll < level5Chance + level4Chance + level3Chance)
+            {
                 level = 3;
+            }
             else if (roll < level5Chance + level4Chance + level3Chance + level2Chance)
+            {
                 level = 2;
+            }
 
             int enemyCount = 5 + waveNumber * 2;
 
@@ -42,16 +50,17 @@ namespace WPFTowerDefense
                 return result;
             }
 
-            List<string> types = waveNumber <= 5
-                ? new List<string> { "Grass" }
-                : new List<string> { "Grass", "Fire", "Water", "Normal" };
+            List<string> types = waveNumber <= 5 ? new List<string> { "Grass" } : new List<string> { "Grass", "Fire", "Water", "Normal" };
 
             for (int i = 0; i < enemyCount; i++)
             {
                 string type = types[rand.Next(types.Count)];
                 var candidates = allEnemies.Where(e => e.Type == type && e.Level == level).ToList();
                 if (candidates.Count > 0)
+                {
                     result.Add(candidates[rand.Next(candidates.Count)]);
+                }
+                    
             }
 
             return result;
