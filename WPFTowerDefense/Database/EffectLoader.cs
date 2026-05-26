@@ -1,6 +1,6 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.Data.SQLite;
+using System.Linq;
 using WPFTowerDefense.GameLogic;
 
 namespace WPFTowerDefense.Database
@@ -10,40 +10,27 @@ namespace WPFTowerDefense.Database
     {
         public static List<EffectData> LoadEffectsFromDatabase(string dbPath)
         {
-            var effects = new List<EffectData>();
-
             try
             {
-                using var conn = new SQLiteConnection($"Data Source={dbPath}");
-                conn.Open();
+                using var db = new TowerDefenseDbContext(dbPath);
 
-                string query = "SELECT Name, Type, DamageFactor, Duration, ValuePercent, ValueFlat FROM Effect";
-                using var cmd = new SQLiteCommand(query, conn);
-                using var reader = cmd.ExecuteReader();
-
-                while (reader.Read())
-                {
-                    effects.Add(new EffectData
+                return db.Effects
+                    .Select(effect => new EffectData
                     {
-                        Name = reader.GetString(0),
-                        Type = reader.GetString(1),
-                        DamageFactor = reader.GetDouble(2),
-                        Duration = reader.GetDouble(3),
-                        ValuePercent = reader.GetDouble(4),
-                        ValueFlat = reader.GetDouble(5)
-                    });
-                }
-            }
-            catch (SQLiteException ex)
-            {
-                Console.WriteLine($"[SQLite Error] Failed to load effects from database: {ex.Message}");
+                        Name = effect.Name,
+                        Type = effect.Type,
+                        DamageFactor = effect.DamageFactor,
+                        Duration = effect.Duration,
+                        ValuePercent = effect.ValuePercent,
+                        ValueFlat = effect.ValueFlat
+                    })
+                    .ToList();
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"[General Error] Unexpected error while loading effects: {ex.Message}");
+                return new List<EffectData>();
             }
-
-            return effects;
         }
     }
 }

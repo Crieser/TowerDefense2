@@ -1,10 +1,10 @@
 using System;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Media;
 using System.Windows.Threading;
 using Prism.Events;
 using WPFTowerDefense.Common;
@@ -22,29 +22,41 @@ namespace WPFTowerDefense.ViewModels
         private GameManager _gameManager;
         private LevelData _currentLevel;
         private Canvas _gameCanvas;
-        private Canvas _upgradeLayer;
         private int _currentWave;
         private Tower _selectedTower;
+        private TowerData _upgradeOption1;
+        private TowerData _upgradeOption2;
+        private string _upgradeTooltip1;
+        private string _upgradeTooltip2;
         private string _waveText = "Wave: 0";
         private string _goldText = "Gold: 500";
         private string _healthText = "HP: 100";
         private Visibility _startGameButtonVisibility = Visibility.Visible;
         private Visibility _returnToMenuButtonVisibility = Visibility.Collapsed;
         private Visibility _insufficientGoldVisibility = Visibility.Collapsed;
+        private Visibility _upgradePanelVisibility = Visibility.Collapsed;
+        private double _upgradePanelX;
+        private double _upgradePanelY;
 
         public PlayLevelScreenViewModel(IEventAggregator eventAggregator, string levelPath) : base(eventAggregator)
         {
             _levelPath = levelPath;
+            Towers = new ObservableCollection<Tower>();
 
             StartGameCommand = new ActionCommand(StartGameCommandExecute, StartGameCommandCanExecute);
             ReturnToMenuCommand = new ActionCommand(ReturnToMenuCommandExecute, ReturnToMenuCommandCanExecute);
+            SelectTowerCommand = new ActionCommand(SelectTowerCommandExecute, SelectTowerCommandCanExecute);
+            UpgradeTowerCommand = new ActionCommand(UpgradeTowerCommandExecute, UpgradeTowerCommandCanExecute);
 
             _waveDelayTimer.Interval = TimeSpan.FromSeconds(5);
             _waveDelayTimer.Tick += WaveDelayTimerTick;
         }
 
+        public ObservableCollection<Tower> Towers { get; private set; }
         public ICommand StartGameCommand { get; private set; }
         public ICommand ReturnToMenuCommand { get; private set; }
+        public ICommand SelectTowerCommand { get; private set; }
+        public ICommand UpgradeTowerCommand { get; private set; }
 
         public string WaveText
         {
@@ -136,7 +148,117 @@ namespace WPFTowerDefense.ViewModels
             }
         }
 
-        public void Initialize(Canvas gameCanvas, Canvas upgradeLayer)
+        public Visibility UpgradePanelVisibility
+        {
+            get { return _upgradePanelVisibility; }
+            set
+            {
+                if (_upgradePanelVisibility == value)
+                {
+                    return;
+                }
+
+                _upgradePanelVisibility = value;
+                OnPropertyChanged(nameof(UpgradePanelVisibility));
+            }
+        }
+
+        public double UpgradePanelX
+        {
+            get { return _upgradePanelX; }
+            set
+            {
+                if (_upgradePanelX == value)
+                {
+                    return;
+                }
+
+                _upgradePanelX = value;
+                OnPropertyChanged(nameof(UpgradePanelX));
+            }
+        }
+
+        public double UpgradePanelY
+        {
+            get { return _upgradePanelY; }
+            set
+            {
+                if (_upgradePanelY == value)
+                {
+                    return;
+                }
+
+                _upgradePanelY = value;
+                OnPropertyChanged(nameof(UpgradePanelY));
+            }
+        }
+
+        public TowerData UpgradeOption1
+        {
+            get { return _upgradeOption1; }
+            set
+            {
+                if (_upgradeOption1 == value)
+                {
+                    return;
+                }
+
+                _upgradeOption1 = value;
+                OnPropertyChanged(nameof(UpgradeOption1));
+                OnPropertyChanged(nameof(UpgradeOption1Text));
+            }
+        }
+
+        public TowerData UpgradeOption2
+        {
+            get { return _upgradeOption2; }
+            set
+            {
+                if (_upgradeOption2 == value)
+                {
+                    return;
+                }
+
+                _upgradeOption2 = value;
+                OnPropertyChanged(nameof(UpgradeOption2));
+                OnPropertyChanged(nameof(UpgradeOption2Text));
+            }
+        }
+
+        public string UpgradeOption1Text { get { return UpgradeOption1 == null ? string.Empty : UpgradeOption1.TowerName; } }
+        public string UpgradeOption2Text { get { return UpgradeOption2 == null ? string.Empty : UpgradeOption2.TowerName; } }
+
+        public string UpgradeTooltip1
+        {
+            get { return _upgradeTooltip1; }
+            set
+            {
+                if (_upgradeTooltip1 == value)
+                {
+                    return;
+                }
+
+                _upgradeTooltip1 = value;
+                OnPropertyChanged(nameof(UpgradeTooltip1));
+            }
+        }
+
+        public string UpgradeTooltip2
+        {
+            get { return _upgradeTooltip2; }
+            set
+            {
+                if (_upgradeTooltip2 == value)
+                {
+                    return;
+                }
+
+                _upgradeTooltip2 = value;
+                OnPropertyChanged(nameof(UpgradeTooltip2));
+            }
+        }
+
+        public void Initialize(Canvas gameCanvas)
         {
             if (_gameManager != null)
             {
@@ -144,7 +266,6 @@ namespace WPFTowerDefense.ViewModels
             }
 
             _gameCanvas = gameCanvas;
-            _upgradeLayer = upgradeLayer;
 
             _gameManager = new GameManager(_gameCanvas, TileSize);
             _gameManager.ShowGoldWarning = ShowInsufficientGoldWarning;
@@ -161,37 +282,24 @@ namespace WPFTowerDefense.ViewModels
             _currentLevel = LevelLoader.LoadLevelFromJson(_levelPath);
             _gameManager.LoadLevel(_currentLevel);
 
-            _gameManager.OnTowerSelected = ShowUpgradeButtons;
             _gameManager.OnGoldChanged = newGold => GoldText = $"Gold: {newGold}";
             _gameManager.OnHealthChanged = newHp => HealthText = $"HP: {newHp}";
             _gameManager.OnPlayerDefeated = OnPlayerDefeated;
             _gameManager.OnWaveEnded = OnWaveEnded;
         }
 
-        public void ClearUpgradeButtons(object originalSource)
+        public void ClearUpgradePanel(object originalSource)
         {
             if (originalSource is not Button)
             {
-                _upgradeLayer?.Children.Clear();
+                UpgradePanelVisibility = Visibility.Collapsed;
+                _selectedTower = null;
             }
-        }
-
-        public void StartTowerDrag(Image image)
-        {
-            if (image.Tag == null)
-            {
-                return;
-            }
-
-            var data = new DataObject();
-            data.SetData("TowerImage", image.Source);
-            data.SetData("TowerID", image.Tag);
-            DragDrop.DoDragDrop(image, data, DragDropEffects.Copy);
         }
 
         public void SetDragEffects(DragEventArgs e)
         {
-            e.Effects = (e.Data.GetDataPresent("TowerImage") && e.Data.GetDataPresent("TowerID"))
+            e.Effects = e.Data.GetDataPresent("TowerID")
                 ? DragDropEffects.Copy
                 : DragDropEffects.None;
 
@@ -200,23 +308,29 @@ namespace WPFTowerDefense.ViewModels
 
         public void DropTower(DragEventArgs e)
         {
-            if (e.Data.GetDataPresent("TowerImage") && e.Data.GetDataPresent("TowerID"))
+            if (!e.Data.GetDataPresent("TowerID"))
             {
-                Point pos = e.GetPosition(_gameCanvas);
-                var image = e.Data.GetData("TowerImage") as ImageSource;
-                var towerId = e.Data.GetData("TowerID")?.ToString();
+                return;
+            }
 
-                int id = int.Parse(towerId);
-                var towerData = _gameManager.GetTowerData().FirstOrDefault(t => t.TowerID == id);
+            Point pos = e.GetPosition(_gameCanvas);
+            var towerId = e.Data.GetData("TowerID")?.ToString();
 
-                if (towerData != null)
+            int id = int.Parse(towerId);
+            var towerData = _gameManager.GetTowerData().FirstOrDefault(t => t.TowerID == id);
+
+            if (towerData != null)
+            {
+                Tower tower = _gameManager.PlaceTower(pos, towerData);
+
+                if (tower != null)
                 {
-                    _gameManager.PlaceTower(pos, image, towerData);
+                    Towers.Add(tower);
                 }
-                else
-                {
-                    MessageBox.Show("TowerData not found.");
-                }
+            }
+            else
+            {
+                MessageBox.Show("TowerData not found.");
             }
         }
 
@@ -252,10 +366,20 @@ namespace WPFTowerDefense.ViewModels
             EndGameAndShowGameOver();
         }
 
-        private void ShowUpgradeButtons(Tower tower)
+        private bool SelectTowerCommandCanExecute(object parameter)
         {
+            return parameter is Tower;
+        }
+
+        private void SelectTowerCommandExecute(object parameter)
+        {
+            Tower tower = parameter as Tower;
+            if (tower == null)
+            {
+                return;
+            }
+
             _selectedTower = tower;
-            _upgradeLayer.Children.Clear();
 
             var upgrades = _gameManager.GetTowerData()
                 .Where(u => u.TowerID == tower.TowerID && u.Tier == tower.Tier + 1)
@@ -263,44 +387,34 @@ namespace WPFTowerDefense.ViewModels
 
             if (upgrades.Count < 2)
             {
+                UpgradePanelVisibility = Visibility.Collapsed;
                 return;
             }
 
-            Button upgradeButton1 = CreateUpgradeButton(upgrades[0], tower);
-            Canvas.SetLeft(upgradeButton1, tower.Position.X + 30);
-            Canvas.SetTop(upgradeButton1, tower.Position.Y - 30);
-            _upgradeLayer.Children.Add(upgradeButton1);
-
-            Button upgradeButton2 = CreateUpgradeButton(upgrades[1], tower);
-            Canvas.SetLeft(upgradeButton2, tower.Position.X - 110);
-            Canvas.SetTop(upgradeButton2, tower.Position.Y - 30);
-            _upgradeLayer.Children.Add(upgradeButton2);
+            UpgradeOption1 = upgrades[0];
+            UpgradeOption2 = upgrades[1];
+            UpgradeTooltip1 = BuildUpgradeTooltip(tower, upgrades[0]);
+            UpgradeTooltip2 = BuildUpgradeTooltip(tower, upgrades[1]);
+            UpgradePanelX = tower.Position.X - 110;
+            UpgradePanelY = tower.Position.Y - 30;
+            UpgradePanelVisibility = Visibility.Visible;
         }
 
-        private Button CreateUpgradeButton(TowerData upgrade, Tower baseTower)
+        private bool UpgradeTowerCommandCanExecute(object parameter)
         {
-            var btn = new Button
-            {
-                Content = upgrade.TowerName,
-                Width = 80,
-                Height = 40,
-                Background = Brushes.LightBlue,
-                Tag = upgrade,
-                ToolTip = BuildUpgradeTooltip(baseTower, upgrade)
-            };
+            return parameter is TowerData && _selectedTower != null;
+        }
 
-            if (_gameManager.Gold < upgrade.Cost)
+        private void UpgradeTowerCommandExecute(object parameter)
+        {
+            TowerData upgrade = parameter as TowerData;
+            if (upgrade == null || _selectedTower == null)
             {
-                btn.IsEnabled = false;
+                return;
             }
 
-            btn.Click += (s, e) =>
-            {
-                _gameManager.UpgradeTower(baseTower, upgrade);
-                _upgradeLayer.Children.Clear();
-            };
-
-            return btn;
+            _gameManager.UpgradeTower(_selectedTower, upgrade);
+            UpgradePanelVisibility = Visibility.Collapsed;
         }
 
         private string BuildUpgradeTooltip(Tower baseTower, TowerData upgrade)

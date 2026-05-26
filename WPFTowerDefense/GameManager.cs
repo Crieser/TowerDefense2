@@ -38,7 +38,6 @@ namespace WPFTowerDefense
         public Action OnPlayerDefeated { get; set; }
         public Action ShowGoldWarning { get; set; }
         public string currentLevelName;
-        public Action<Tower> OnTowerSelected;
 
         public GameManager(Canvas canvas, int tileSize)
         {
@@ -149,12 +148,12 @@ namespace WPFTowerDefense
             AddGold(200);
         }
 
-        public void PlaceTower(Point dropPosition, ImageSource towerImage, TowerData towerData)
+        public Tower PlaceTower(Point dropPosition, TowerData towerData)
         {
             if (Gold < towerData.Cost)
             {
                 ShowGoldWarning?.Invoke();
-                return;
+                return null;
             }
 
             int gridX = (int)(dropPosition.X / tileSize);
@@ -162,14 +161,14 @@ namespace WPFTowerDefense
             Point gridPos = new(gridX, gridY);
 
             if (enemyPath.Contains(gridPos))
-                return;
+                return null;
 
             foreach (var tower in placedTowers)
             {
                 int towerX = (int)(tower.Position.X / tileSize);
                 int towerY = (int)(tower.Position.Y / tileSize);
                 if (towerX == gridX && towerY == gridY)
-                    return;
+                    return null;
             }
 
             double snappedX = gridX * tileSize;
@@ -178,6 +177,9 @@ namespace WPFTowerDefense
             Tower newTower = new Tower
             {
                 Position = new Point(snappedX + tileSize / 2, snappedY + tileSize / 2),
+                VisualX = snappedX,
+                VisualY = snappedY,
+                TexturePath = $"pack://application:,,,/Resources/Towers/{towerData.Type}Tower.png",
                 TowerID = towerData.TowerID,
                 Type = towerData.Type,
                 Effect = towerData.Effect,
@@ -196,24 +198,7 @@ namespace WPFTowerDefense
             OnGoldChanged?.Invoke(Gold);
 
             placedTowers.Add(newTower);
-
-            Image towerImageVisual = new()
-            {
-                Width = tileSize,
-                Height = tileSize,
-                Source = towerImage,
-                IsHitTestVisible = true
-            };
-
-            towerImageVisual.MouseLeftButtonDown += (s, e) =>
-            {
-                OnTowerSelected?.Invoke(newTower);
-                e.Handled = true;
-            };
-
-            Canvas.SetLeft(towerImageVisual, snappedX);
-            Canvas.SetTop(towerImageVisual, snappedY);
-            gameCanvas.Children.Add(towerImageVisual);
+            return newTower;
         }
 
         public void SetEnemyData(List<EnemyData> data)
@@ -251,6 +236,8 @@ namespace WPFTowerDefense
             baseTower.AoERadius = upgrade.AoERadius;
             baseTower.Effect = upgrade.Effect;
             baseTower.UpgradeID = upgrade.UpgradeID;
+            baseTower.TowerName = upgrade.TowerName;
+            baseTower.NotifyTowerChanged();
 
             Console.WriteLine($"Upgraded to {upgrade.TowerName}");
         }

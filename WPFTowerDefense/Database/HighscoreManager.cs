@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data.SQLite;
+using System;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace WPFTowerDefense.Database
 {
@@ -14,19 +10,12 @@ namespace WPFTowerDefense.Database
         {
             try
             {
-                using var conn = new SQLiteConnection($"Data Source={dbPath}");
-                conn.Open();
+                using var db = new TowerDefenseDbContext(dbPath);
 
-                using var cmd = new SQLiteCommand("SELECT BestWave FROM Highscores WHERE GameLevel = @level", conn);
-                cmd.Parameters.AddWithValue("@level", levelName);
+                var highscore = db.Highscores
+                    .FirstOrDefault(score => score.GameLevel == levelName);
 
-                var result = cmd.ExecuteScalar();
-                return result != null ? Convert.ToInt32(result) : 0;
-            }
-            catch (SQLiteException ex)
-            {
-                Console.WriteLine($"[SQLite Error] Failed to get best wave: {ex.Message}");
-                return 0;
+                return highscore == null ? 0 : highscore.BestWave;
             }
             catch (Exception ex)
             {
@@ -39,20 +28,18 @@ namespace WPFTowerDefense.Database
         {
             try
             {
-                int currentBest = GetBestWave(dbPath, levelName);
-                if (wave <= currentBest) return;
+                using var db = new TowerDefenseDbContext(dbPath);
 
-                using var conn = new SQLiteConnection($"Data Source={dbPath}");
-                conn.Open();
+                var highscore = db.Highscores
+                    .FirstOrDefault(score => score.GameLevel == levelName);
 
-                using var cmd = new SQLiteCommand("UPDATE Highscores SET BestWave = @wave WHERE GameLevel = @level", conn);
-                cmd.Parameters.AddWithValue("@wave", wave);
-                cmd.Parameters.AddWithValue("@level", levelName);
-                cmd.ExecuteNonQuery();
-            }
-            catch (SQLiteException ex)
-            {
-                Console.WriteLine($"[SQLite Error] Failed to update best wave: {ex.Message}");
+                if (highscore == null || wave <= highscore.BestWave)
+                {
+                    return;
+                }
+
+                highscore.BestWave = wave;
+                db.SaveChanges();
             }
             catch (Exception ex)
             {
