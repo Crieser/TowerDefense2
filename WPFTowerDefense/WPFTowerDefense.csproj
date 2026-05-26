@@ -6,6 +6,7 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
+    <ApplicationIcon>Images\ChatGPT Image May 26, 2026, 04_16_55 PM.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
@@ -36,6 +37,7 @@
     <Content Include="Database\TD.db">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Images\ChatGPT Image May 26, 2026, 04_16_55 PM.ico" />
   </ItemGroup>
 
   <ItemGroup>
