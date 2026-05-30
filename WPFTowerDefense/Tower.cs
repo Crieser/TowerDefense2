@@ -57,6 +57,7 @@ namespace WPFTowerDefense
             OnPropertyChanged(nameof(AttackSpeed));
             OnPropertyChanged(nameof(Effect));
             OnPropertyChanged(nameof(UpgradeID));
+            OnPropertyChanged(nameof(Cost));
             OnPropertyChanged(nameof(InfoText));
         }
     }

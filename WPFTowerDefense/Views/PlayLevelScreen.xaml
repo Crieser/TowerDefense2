@@ -47,22 +47,31 @@
             <Canvas Panel.ZIndex="20">
                 <StackPanel Canvas.Left="{Binding UpgradePanelX}"
                             Canvas.Top="{Binding UpgradePanelY}"
-                            Orientation="Horizontal"
                             Visibility="{Binding UpgradePanelVisibility}">
-                    <Button Content="{Binding UpgradeOption1Text}"
-                            Width="80"
+                    <StackPanel Orientation="Horizontal">
+                        <Button Content="{Binding UpgradeOption1Text}"
+                                Width="80"
+                                Height="40"
+                                Background="LightBlue"
+                                Visibility="{Binding UpgradeOption1Visibility}"
+                                ToolTip="{Binding UpgradeTooltip1}"
+                                Command="{Binding UpgradeTowerCommand}"
+                                CommandParameter="{Binding UpgradeOption1}"/>
+                        <Button Content="{Binding UpgradeOption2Text}"
+                                Width="80"
+                                Height="40"
+                                Background="LightBlue"
+                                Visibility="{Binding UpgradeOption2Visibility}"
+                                ToolTip="{Binding UpgradeTooltip2}"
+                                Command="{Binding UpgradeTowerCommand}"
+                                CommandParameter="{Binding UpgradeOption2}"/>
+                    </StackPanel>
+                    <Button Content="{Binding SellTowerText}"
+                            Width="160"
                             Height="40"
-                            Background="LightBlue"
-                            ToolTip="{Binding UpgradeTooltip1}"
-                            Command="{Binding UpgradeTowerCommand}"
-                            CommandParameter="{Binding UpgradeOption1}"/>
-                    <Button Content="{Binding UpgradeOption2Text}"
-                            Width="80"
-                            Height="40"
-                            Background="LightBlue"
-                            ToolTip="{Binding UpgradeTooltip2}"
-                            Command="{Binding UpgradeTowerCommand}"
-                            CommandParameter="{Binding UpgradeOption2}"/>
+                            Background="LightCoral"
+                            ToolTip="{Binding SellTowerTooltip}"
+                            Command="{Binding SellTowerCommand}"/>
                 </StackPanel>
             </Canvas>
         </Grid>

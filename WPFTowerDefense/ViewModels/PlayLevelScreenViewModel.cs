@@ -28,6 +28,8 @@ namespace WPFTowerDefense.ViewModels
         private TowerData _upgradeOption2;
         private string _upgradeTooltip1;
         private string _upgradeTooltip2;
+        private Visibility _upgradeOption1Visibility = Visibility.Collapsed;
+        private Visibility _upgradeOption2Visibility = Visibility.Collapsed;
         private string _waveText = "Wave: 0";
         private string _goldText = "Gold: 500";
         private string _healthText = "HP: 100";
@@ -47,6 +49,7 @@ namespace WPFTowerDefense.ViewModels
             ReturnToMenuCommand = new ActionCommand(ReturnToMenuCommandExecute, ReturnToMenuCommandCanExecute);
             SelectTowerCommand = new ActionCommand(SelectTowerCommandExecute, SelectTowerCommandCanExecute);
             UpgradeTowerCommand = new ActionCommand(UpgradeTowerCommandExecute, UpgradeTowerCommandCanExecute);
+            SellTowerCommand = new ActionCommand(SellTowerCommandExecute, SellTowerCommandCanExecute);
 
             _waveDelayTimer.Interval = TimeSpan.FromSeconds(5);
             _waveDelayTimer.Tick += WaveDelayTimerTick;
@@ -57,6 +60,7 @@ namespace WPFTowerDefense.ViewModels
         public ICommand ReturnToMenuCommand { get; private set; }
         public ICommand SelectTowerCommand { get; private set; }
         public ICommand UpgradeTowerCommand { get; private set; }
+        public ICommand SellTowerCommand { get; private set; }
 
         public string WaveText
         {
@@ -227,6 +231,38 @@ namespace WPFTowerDefense.ViewModels
 
         public string UpgradeOption1Text { get { return UpgradeOption1 == null ? string.Empty : UpgradeOption1.TowerName; } }
         public string UpgradeOption2Text { get { return UpgradeOption2 == null ? string.Empty : UpgradeOption2.TowerName; } }
+        public string SellTowerText { get { return _selectedTower == null ? "Sell" : $"Sell (+{GetSellValue(_selectedTower)})"; } }
+        public string SellTowerTooltip { get { return _selectedTower == null ? string.Empty : $"Refunds 70% of this tower's value: {GetSellValue(_selectedTower)} gold"; } }
+
+        public Visibility UpgradeOption1Visibility
+        {
+            get { return _upgradeOption1Visibility; }
+            set
+            {
+                if (_upgradeOption1Visibility == value)
+                {
+                    return;
+                }
+
+                _upgradeOption1Visibility = value;
+                OnPropertyChanged(nameof(UpgradeOption1Visibility));
+            }
+        }
+
+        public Visibility UpgradeOption2Visibility
+        {
+            get { return _upgradeOption2Visibility; }
+            set
+            {
+                if (_upgradeOption2Visibility == value)
+                {
+                    return;
+                }
+
+                _upgradeOption2Visibility = value;
+                OnPropertyChanged(nameof(UpgradeOption2Visibility));
+            }
+        }
 
         public string UpgradeTooltip1
         {
@@ -292,8 +328,7 @@ namespace WPFTowerDefense.ViewModels
         {
             if (originalSource is not Button)
             {
-                UpgradePanelVisibility = Visibility.Collapsed;
-                _selectedTower = null;
+                ClearSelectedTower();
             }
         }
 
@@ -385,19 +420,17 @@ namespace WPFTowerDefense.ViewModels
                 .Where(u => u.TowerID == tower.TowerID && u.Tier == tower.Tier + 1)
                 .ToList();
 
-            if (upgrades.Count < 2)
-            {
-                UpgradePanelVisibility = Visibility.Collapsed;
-                return;
-            }
-
-            UpgradeOption1 = upgrades[0];
-            UpgradeOption2 = upgrades[1];
-            UpgradeTooltip1 = BuildUpgradeTooltip(tower, upgrades[0]);
-            UpgradeTooltip2 = BuildUpgradeTooltip(tower, upgrades[1]);
+            UpgradeOption1 = upgrades.ElementAtOrDefault(0);
+            UpgradeOption2 = upgrades.ElementAtOrDefault(1);
+            UpgradeTooltip1 = UpgradeOption1 == null ? string.Empty : BuildUpgradeTooltip(tower, UpgradeOption1);
+            UpgradeTooltip2 = UpgradeOption2 == null ? string.Empty : BuildUpgradeTooltip(tower, UpgradeOption2);
+            UpgradeOption1Visibility = UpgradeOption1 == null ? Visibility.Collapsed : Visibility.Visible;
+            UpgradeOption2Visibility = UpgradeOption2 == null ? Visibility.Collapsed : Visibility.Visible;
             UpgradePanelX = tower.Position.X - 110;
             UpgradePanelY = tower.Position.Y - 30;
             UpgradePanelVisibility = Visibility.Visible;
+            OnPropertyChanged(nameof(SellTowerText));
+            OnPropertyChanged(nameof(SellTowerTooltip));
         }
 
         private bool UpgradeTowerCommandCanExecute(object parameter)
@@ -414,7 +447,25 @@ namespace WPFTowerDefense.ViewModels
             }
 
             _gameManager.UpgradeTower(_selectedTower, upgrade);
-            UpgradePanelVisibility = Visibility.Collapsed;
+            ClearSelectedTower();
+        }
+
+        private bool SellTowerCommandCanExecute(object parameter)
+        {
+            return _selectedTower != null;
+        }
+
+        private void SellTowerCommandExecute(object parameter)
+        {
+            if (_selectedTower == null)
+            {
+                return;
+            }
+
+            Tower towerToSell = _selectedTower;
+            _gameManager.SellTower(towerToSell);
+            Towers.Remove(towerToSell);
+            ClearSelectedTower();
         }
 
         private string BuildUpgradeTooltip(Tower baseTower, TowerData upgrade)
@@ -429,6 +480,25 @@ namespace WPFTowerDefense.ViewModels
                 $"Attack Speed: {baseTower.AttackSpeed:0.##} -> {upgrade.AttackSpeed:0.##}\n" +
                 $"AoE Radius: {baseTower.AoERadius:0.##} -> {upgrade.AoERadius:0.##}\n" +
                 $"Effect: {effectFrom} -> {effectTo}";
+        }
+
+        private int GetSellValue(Tower tower)
+        {
+            return (int)(tower.Cost * 0.7);
+        }
+
+        private void ClearSelectedTower()
+        {
+            UpgradePanelVisibility = Visibility.Collapsed;
+            _selectedTower = null;
+            UpgradeOption1 = null;
+            UpgradeOption2 = null;
+            UpgradeTooltip1 = string.Empty;
+            UpgradeTooltip2 = string.Empty;
+            UpgradeOption1Visibility = Visibility.Collapsed;
+            UpgradeOption2Visibility = Visibility.Collapsed;
+            OnPropertyChanged(nameof(SellTowerText));
+            OnPropertyChanged(nameof(SellTowerTooltip));
         }
 
         private async void ShowInsufficientGoldWarning()

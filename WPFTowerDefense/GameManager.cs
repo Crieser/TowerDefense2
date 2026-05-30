@@ -237,9 +237,24 @@ namespace WPFTowerDefense
             baseTower.Effect = upgrade.Effect;
             baseTower.UpgradeID = upgrade.UpgradeID;
             baseTower.TowerName = upgrade.TowerName;
+            baseTower.Cost = upgrade.Cost;
             baseTower.NotifyTowerChanged();
 
             Console.WriteLine($"Upgraded to {upgrade.TowerName}");
+        }
+
+        public int SellTower(Tower tower)
+        {
+            if (tower == null || !placedTowers.Remove(tower))
+            {
+                return 0;
+            }
+
+            int refund = (int)(tower.Cost * 0.7);
+            Gold += refund;
+            OnGoldChanged?.Invoke(Gold);
+
+            return refund;
         }
 
         public void StartWave(int waveNumber)
