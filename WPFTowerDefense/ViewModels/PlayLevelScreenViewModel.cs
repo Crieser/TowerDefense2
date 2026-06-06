@@ -301,6 +301,7 @@ namespace WPFTowerDefense.ViewModels
                 return;
             }
 
+            // Load all game data once the play canvas is ready.
             _gameCanvas = gameCanvas;
 
             _gameManager = new GameManager(_gameCanvas, TileSize);
@@ -348,6 +349,7 @@ namespace WPFTowerDefense.ViewModels
                 return;
             }
 
+            // Convert the dragged tower id into the matching tower data.
             Point pos = e.GetPosition(_gameCanvas);
             var towerId = e.Data.GetData("TowerID")?.ToString();
 
@@ -414,6 +416,7 @@ namespace WPFTowerDefense.ViewModels
                 return;
             }
 
+            // Show only upgrades for the next tier of the selected tower.
             _selectedTower = tower;
 
             var upgrades = _gameManager.GetTowerData()
@@ -515,6 +518,7 @@ namespace WPFTowerDefense.ViewModels
                 return;
             }
 
+            // Keep the UI wave counter in sync with the game manager.
             _currentWave++;
             WaveText = $"Wave: {_currentWave}";
             _gameManager.StartWave(_currentWave);

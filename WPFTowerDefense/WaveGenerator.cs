@@ -22,6 +22,7 @@ namespace WPFTowerDefense
             double level5Chance = Math.Clamp((waveNumber - 40) * 0.1, 0, 1);
             double roll = rand.NextDouble();
 
+            // Higher waves have a growing chance to use stronger enemy levels.
             if (roll < level5Chance)
             {
                 level = 5;
@@ -65,6 +66,7 @@ namespace WPFTowerDefense
 
             if (waveNumber >= 10 && waveNumber % 5 == 0)
             {
+                // Add one scaling boss every five waves starting at wave 10.
                 int bossLevel = Math.Clamp(((waveNumber - 10) / 5) + 1, 1, 5);
                 var boss = allEnemies.FirstOrDefault(e => e.Type == "Boss" && e.Level == bossLevel);
                 if (boss != null)

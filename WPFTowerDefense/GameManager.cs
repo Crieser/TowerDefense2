@@ -57,6 +57,7 @@ namespace WPFTowerDefense
         {
             gameCanvas.Children.Clear();
 
+            // Draw the map tiles before enemies and towers are added.
             for (int x = 0; x < gridWidth; x++)
             {
                 for (int y = 0; y < gridHeight; y++)
@@ -160,6 +161,7 @@ namespace WPFTowerDefense
             int gridY = (int)(dropPosition.Y / tileSize);
             Point gridPos = new(gridX, gridY);
 
+            // Prevent towers from blocking the enemy path.
             if (enemyPath.Contains(gridPos))
                 return null;
 
@@ -260,6 +262,7 @@ namespace WPFTowerDefense
         public void StartWave(int waveNumber)
         {
             currentWaveNumber = waveNumber;
+            // Queue all enemies before the render loop starts spawning them.
             currentWaveQueue = new Queue<EnemyData>(
                 WaveGenerator.GenerateWave(loadedEnemyData, currentWaveNumber)
             );
@@ -309,6 +312,7 @@ namespace WPFTowerDefense
             {
                 if (currentWaveQueue.TryDequeue(out EnemyData data))
                 {
+                    // Spawn the next queued enemy on the active path.
                     Enemy enemy = new Enemy(data, enemyPath, tileSize, gameCanvas);
                     activeEnemies.Add(enemy);
                     enemiesSpawned++;
@@ -342,6 +346,7 @@ namespace WPFTowerDefense
             if (enemiesSpawned >= enemiesToSpawn && activeEnemies.Count == 0)
             {
                 CompositionTarget.Rendering -= GameLoop;
+                // Reward the player once the whole wave is cleared.
                 RewardWaveEnd();
                 OnWaveEnded?.Invoke();
             }
@@ -370,6 +375,7 @@ namespace WPFTowerDefense
                                 {
                                     double dmg = tower.Damage;
 
+                                    // Apply type weakness or resistance before dealing damage.
                                     if (targetEnemy.Data.Vulnerability == tower.Type)
                                     {
                                         dmg += tower.Damage * targetEnemy.Data.IncreasedDamageTakenPercent;

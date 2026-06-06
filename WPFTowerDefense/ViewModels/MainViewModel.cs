@@ -12,6 +12,7 @@ namespace WPFTowerDefense.ViewModels
 
         public MainViewModel(IEventAggregator eventAggregator) : base(eventAggregator)
         {
+            // Listen for navigation requests from other view models.
             EventAggregator.GetEvent<NavigationEvent>()
                 .Subscribe(OnNavigationRequested, ThreadOption.UIThread);
 
@@ -109,6 +110,7 @@ namespace WPFTowerDefense.ViewModels
                 return;
             }
 
+            // Swap the active screen based on the requested target.
             if (request.Target == "Start")
             {
                 ShowStartScreen();
