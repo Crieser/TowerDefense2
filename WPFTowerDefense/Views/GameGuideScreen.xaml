@@ -15,6 +15,6 @@
                 HorizontalAlignment="Left"
                 Margin="10"
                 Panel.ZIndex="1"/>
-        <Image Source="pack://application:,,,/Images/gameguide.png" />
+        <Image Source="pack://application:,,,/WPFTowerDefense;component/Images/gameguide.png" />
     </Grid>
 </UserControl>

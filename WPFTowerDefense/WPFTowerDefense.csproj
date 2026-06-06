@@ -50,6 +50,7 @@
     <Resource Include="Images\epictitleimage.png" />
     <Resource Include="Images\floor.png" />
     <Resource Include="Images\gameguide.png" />
+    <Resource Include="Images\gameguide2.png" />
     <Resource Include="Images\levela.png" />
     <Resource Include="Images\levelb.png" />
     <Resource Include="Images\levelc.png" />
