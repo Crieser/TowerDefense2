@@ -24,7 +24,7 @@
                     Margin="0,250,0,0"/>
             <StackPanel HorizontalAlignment="Left" VerticalAlignment="Top" Width="1024" Height="640">
                 <Image Source="{Binding LevelPreviewImage}" Height="512" Width="1024"/>
-                <TextBlock Height="150" FontSize="25" HorizontalAlignment="Center">Placeholder description :(</TextBlock>
+                <TextBlock Height="150" FontSize="25" HorizontalAlignment="Center">Select a Level!</TextBlock>
             </StackPanel>
             <Button Content="Next"
                     VerticalAlignment="Top"
