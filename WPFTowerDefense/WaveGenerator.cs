@@ -63,6 +63,16 @@ namespace WPFTowerDefense
                     
             }
 
+            if (waveNumber >= 10 && waveNumber % 5 == 0)
+            {
+                int bossLevel = Math.Clamp(((waveNumber - 10) / 5) + 1, 1, 5);
+                var boss = allEnemies.FirstOrDefault(e => e.Type == "Boss" && e.Level == bossLevel);
+                if (boss != null)
+                {
+                    result.Add(boss);
+                }
+            }
+
             return result;
         }
     }

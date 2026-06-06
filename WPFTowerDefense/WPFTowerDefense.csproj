@@ -21,6 +21,7 @@
     <None Remove="Resources\Enemies\Enemygrass.png" />
     <None Remove="Resources\Enemies\Enemynormal.png" />
     <None Remove="Resources\Enemies\Enemywater.png" />
+    <None Remove="Resources\Enemies\Boss.png" />
     <None Remove="Resources\MapTiles\GrassFloor.png" />
     <None Remove="Resources\MapTiles\PathBottomLeft.png" />
     <None Remove="Resources\MapTiles\PathBottomRight.png" />
@@ -56,6 +57,7 @@
     <Resource Include="Resources\Enemies\EnemyGrass.png" />
     <Resource Include="Resources\Enemies\EnemyNormal.png" />
     <Resource Include="Resources\Enemies\EnemyWater.png" />
+    <Resource Include="Resources\Enemies\Boss.png" />
     <Resource Include="Resources\MapTiles\GrassFloor.png" />
     <Resource Include="Resources\MapTiles\PathBottomLeft.png" />
     <Resource Include="Resources\MapTiles\PathBottomRight.png" />

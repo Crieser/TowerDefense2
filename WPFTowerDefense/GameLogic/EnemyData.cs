@@ -22,6 +22,8 @@ namespace WPFTowerDefense.GameLogic
         public int Damage { get; set; }
         public int GoldDrop { get; set; }
 
-        public string TexturePath => $"pack://application:,,,/Resources/Enemies/Enemy{Type}.png";
+        public string TexturePath => Type == "Boss"
+            ? "pack://application:,,,/Resources/Enemies/Boss.png"
+            : $"pack://application:,,,/Resources/Enemies/Enemy{Type}.png";
     }
 }

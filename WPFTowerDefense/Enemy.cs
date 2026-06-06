@@ -159,6 +159,18 @@ namespace WPFTowerDefense
 
         public void ApplyEffect(EffectData effect)
         {
+            if (effect.Type == "slow")
+            {
+                var activeSlow = activeEffects.Find(activeEffect => activeEffect.Type == "slow");
+                if (activeSlow != null)
+                {
+                    activeSlow.RemainingTime = effect.Duration;
+                    activeSlow.ValuePercent = effect.ValuePercent;
+                    activeSlow.DamagePerSecond = effect.DamageFactor;
+                    return;
+                }
+            }
+
             activeEffects.Add(new ActiveEffect
             {
                 Type = effect.Type,
